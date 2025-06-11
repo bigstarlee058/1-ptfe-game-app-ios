@@ -23,8 +23,8 @@ type Props = {
 export default function Billing({ route, navigation }: Props) {
     const isFromRegister = route.params?.isFromRegister;
     const userid = route.params?.userid;
-    console.log("&&&&&");
-    console.log(userid);
+    const isFromLogin = route.params?.home;
+    console.log("this is billing",route.params)
     const { user } = useSelector((state: any) => state.userData);
     const features = [
         "7-day Free Trial to get you started",
@@ -87,7 +87,7 @@ export default function Billing({ route, navigation }: Props) {
             
             Alert.alert("Success", "You have successfully purchased the product!");
             // navigation.navigate("Home", { screen: "Dashboard" });
-            navigation.navigate('Login');
+            navigation.navigate("Main");
           }
         } catch (e: any) {
             if (e.code === PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR) {
@@ -117,10 +117,9 @@ export default function Billing({ route, navigation }: Props) {
         Alert.alert("Error", "Failed to restore purchases. Please try again.");
       }
     };
-    console.log("this is billing page", products);
 
     const goBack = useCallback(() => {
-        navigation.goBack();
+      navigation.navigate("SettingScreen");
     }, [navigation]);
     // const onClick = useCallback(() => {
     //         navigation.navigate("Home", {
@@ -128,9 +127,12 @@ export default function Billing({ route, navigation }: Props) {
     //         });
     // }, [navigation]);
     const goSkip = useCallback(() => {
-      navigation.navigate('Login');
-      // navigation.navigate("Billing");
-  }, []);
+      if (isFromLogin == true) {
+        navigation.navigate("Main");
+      } else {
+        navigation.navigate("SettingScreen");
+      }
+  }, [navigation]);
 
   const postPurchaseID = useCallback(async () => {
     const data = {
@@ -145,158 +147,160 @@ export default function Billing({ route, navigation }: Props) {
     }
   }, []);
 
-    return (
+  return (
     <KeyboardAvoidingView
       style={styles.keyboardcontainer}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-    <ScrollView style={{width: "100%"}}>
-      <View style={styles.container}>
-        <LinearGradient
-          colors={["#FF675B", "#87C6E8"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.upperGradientContainer}
-        />
-        {isFromRegister == false ?
-        <TouchableOpacity style={styles.backContainer} onPress={goBack}>
-          <View style={styles.back}>
-            <Entypo
-              name="chevron-left"
-              size={moderateScale(20)}
-              color="#FF675B"
-            />
-          </View>
-        </TouchableOpacity>
-        :
-        <TouchableOpacity style={styles.nextContainer} onPress={goSkip}>
-          <View style={styles.back}>
-            <Entypo
-              name="chevron-right"
-              size={moderateScale(20)}
-              color="#FF675B"
-            />
-          </View>
-        </TouchableOpacity>
-        }
-        <View style={styles.backgroundCircle1} />
-        <View style={styles.backgroundCircle2} />
-        <View style={styles.backgroundCircle3} />
-        <View style={styles.backgroundSquare} />
-        <View style={styles.sectionStartImage}>
-          <Image
-            style={styles.loginPanda}
-            source={require("assets/images/imgs/npte-ninja-logo.png")}
+      <ScrollView style={{width: "100%"}}>
+        <View style={styles.container}>
+          <LinearGradient
+            colors={["#FF675B", "#87C6E8"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.upperGradientContainer}
           />
-        </View>
-        <View style={styles.sectionLogin}>
+          {isFromRegister == false ?
+          <TouchableOpacity style={styles.backContainer} onPress={goBack}>
+            <View style={styles.back}>
+              <Entypo
+                name="chevron-left"
+                size={moderateScale(20)}
+                color="#FF675B"
+              />
+            </View>
+          </TouchableOpacity>
+          :
+          <TouchableOpacity style={styles.nextContainer} onPress={goSkip}>
+            <View style={styles.back}>
+              <Entypo
+                name="cross"
+                size={moderateScale(20)}
+                color="#FF675B"
+              />
+            </View>
+          </TouchableOpacity>
+          }
+          <View style={styles.backgroundCircle1} />
+          <View style={styles.backgroundCircle2} />
+          <View style={styles.backgroundCircle3} />
+          <View style={styles.backgroundSquare} />
+          <View style={styles.sectionStartImage}>
+            <Image
+              style={styles.loginPanda}
+              source={require("assets/images/imgs/npte-ninja-logo.png")}
+            />
+          </View>
+          <View style={styles.sectionLogin}>
             <View style={styles.whiteContainer}>
-                <Text style={styles.text_title}>Unlock Unlimited Acccess</Text>
-                <View style={styles.featureContainer}>
-                    <FlatList
-                        data={features}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={({ item }) => (
-                        <View style={styles.featureItem}>
-                            <Ionicons name="checkmark-circle" size={scale(23)} color="#FF6B6B" />
-                            <Text style={styles.featureText}>{item}</Text>
+              <Text style={styles.text_title}>Unlock Unlimited Acccess</Text>
+              <View style={styles.featureContainer}>
+                  <FlatList
+                      data={features}
+                      keyExtractor={(item, index) => index.toString()}
+                      renderItem={({ item }) => (
+                      <View style={styles.featureItem}>
+                          <Ionicons name="checkmark-circle" size={scale(23)} color="#FF6B6B" />
+                          <Text style={styles.featureText}>{item}</Text>
+                      </View>
+                      )}
+                      style={styles.checklist}
+                  />
+              </View>
+              <View style={styles.featureContainer}>
+                <View style={styles.toggleContainer}>
+                    <TouchableOpacity
+                        style={[
+                            styles.toggleButton,
+                            selectedStudentType === "PT Student" && styles.activeButton,
+                        ]}
+                        onPress={() => setSelectedStudentType("PT Student")}
+                    >
+                        <View style={styles.plan1Container}>
+                        <View style={[styles.radioCircle, selectedStudentType === "PT Student" && styles.activeRadio]}>
+                        {selectedStudentType === "PT Student" && <View style={styles.radioSelected} />}
                         </View>
-                        )}
-                        style={styles.checklist}
-                    />
-                    <View style={styles.toggleContainer}>
-                        <TouchableOpacity
+                        <Text
                             style={[
-                                styles.toggleButton,
-                                selectedStudentType === "PT Student" && styles.activeButton,
+                            styles.toggleText,
+                            selectedStudentType === "PT Student" && styles.activeText,
                             ]}
-                            onPress={() => setSelectedStudentType("PT Student")}
                         >
-                            <View style={styles.plan1Container}>
-                            <View style={[styles.radioCircle, selectedStudentType === "PT Student" && styles.activeRadio]}>
-                            {selectedStudentType === "PT Student" && <View style={styles.radioSelected} />}
-                            </View>
-                            <Text
-                                style={[
-                                styles.toggleText,
-                                selectedStudentType === "PT Student" && styles.activeText,
-                                ]}
-                            >
-                                PT Student
-                            </Text>
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity
+                            PT Student
+                        </Text>
+                        </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[
+                            styles.toggleButton,
+                            selectedStudentType === "PTA Student" && styles.activeButton,
+                        ]}
+                        onPress={() => setSelectedStudentType("PTA Student")}
+                    >
+                        <View style={styles.plan1Container}>
+                        <View style={[styles.radioCircle, selectedStudentType === "PTA Student" && styles.activeRadio]}>
+                        {selectedStudentType === "PTA Student" && <View style={styles.radioSelected} />}
+                        </View>
+                        <Text
                             style={[
-                                styles.toggleButton,
-                                selectedStudentType === "PTA Student" && styles.activeButton,
+                            styles.toggleText,
+                            selectedStudentType === "PTA Student" && styles.activeText,
                             ]}
-                            onPress={() => setSelectedStudentType("PTA Student")}
                         >
-                            <View style={styles.plan1Container}>
-                            <View style={[styles.radioCircle, selectedStudentType === "PTA Student" && styles.activeRadio]}>
-                            {selectedStudentType === "PTA Student" && <View style={styles.radioSelected} />}
-                            </View>
-                            <Text
-                                style={[
-                                styles.toggleText,
-                                selectedStudentType === "PTA Student" && styles.activeText,
-                                ]}
-                            >
-                                PTA Student
-                            </Text>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
+                            PTA Student
+                        </Text>
+                        </View>
+                    </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                    style={[
-                    styles.planOption,
-                    selectedPlan === "1 Month" && styles.activePlan,
-                    ]}
-                    onPress={() => setSelectedPlan("1 Month")}
-                >
-                    <View style={[styles.radioCircle, selectedPlan === "1 Month" && styles.activeRadio]}>
-                    {selectedPlan === "1 Month" && <View style={styles.radioSelected} />}
-                    </View>
-                    <Text style={[styles.planText, selectedPlan === "1 Month" && styles.activeText]}>1 Month: $7.99</Text>
-                    <Text style={[styles.smallPlanText, selectedPlan === "1 Month" && styles.activeText]}>(Cancel anytime)</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={[
-                    styles.planOption,
-                    selectedPlan === "1 Year" && styles.activePlan,
-                    ]}
-                    onPress={() => setSelectedPlan("1 Year")}
-                >
-                    <View style={[styles.radioCircle, selectedPlan === "1 Year" && styles.activeRadio]}>
-                    {selectedPlan === "1 Year" && <View style={styles.radioSelected} />}
-                    </View>
-                    <Text style={[styles.planText, selectedPlan === "1 Year" && styles.activeText]}>1 Year: $79.99</Text>
-                    <Text style={[styles.smallPlanText, selectedPlan === "1 Year" && styles.activeText]}>(Cancel anytime)</Text>
-                </TouchableOpacity>
-                
-                <View style={styles.buttonContainer}>
-                    <PTFEButton
-                        text="Start 7-Day Free Trial"
-                        type="rounded"
-                        color="#FF675B"
-                        onClick={handlePurchase}
-                        // onClick={handleGoBack}
-                    />
-                </View>
-                <View style={styles.bottomTextContainer}>
+              </View>
+              <TouchableOpacity
+                  style={[
+                  styles.planOption,
+                  selectedPlan === "1 Month" && styles.activePlan,
+                  ]}
+                  onPress={() => setSelectedPlan("1 Month")}
+              >
+                  <View style={[styles.radioCircle, selectedPlan === "1 Month" && styles.activeRadio]}>
+                  {selectedPlan === "1 Month" && <View style={styles.radioSelected} />}
+                  </View>
+                  <Text style={[styles.planText, selectedPlan === "1 Month" && styles.activeText]}>1 Month: $7.99</Text>
+                  <Text style={[styles.smallPlanText, selectedPlan === "1 Month" && styles.activeText]}>(Cancel anytime)</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                  style={[
+                  styles.planOption,
+                  selectedPlan === "1 Year" && styles.activePlan,
+                  ]}
+                  onPress={() => setSelectedPlan("1 Year")}
+              >
+                  <View style={[styles.radioCircle, selectedPlan === "1 Year" && styles.activeRadio]}>
+                  {selectedPlan === "1 Year" && <View style={styles.radioSelected} />}
+                  </View>
+                  <Text style={[styles.planText, selectedPlan === "1 Year" && styles.activeText]}>1 Year: $79.99</Text>
+                  <Text style={[styles.smallPlanText, selectedPlan === "1 Year" && styles.activeText]}>(Cancel anytime)</Text>
+              </TouchableOpacity>
+              
+              <View style={styles.buttonContainer}>
+                  <PTFEButton
+                      text="Start 7-Day Free Trial"
+                      type="rounded"
+                      color="#87c6e8"
+                      onClick={handlePurchase}
+                      // onClick={handleGoBack}
+                  />
+              </View>
+              <View style={styles.bottomTextContainer}>
                 <TouchableOpacity onPress={handleRestorePurchases}>
                     <Text style={styles.BottomText}>Restore purchases</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => Linking.openURL("https://your-terms-and-policy-url")}>
+                    <TouchableOpacity onPress={() => Linking.openURL("https://ptfinalexam.com/terms-and-conditions/")}>
                     <Text style={styles.BottomText}>Terms & Policy</Text>
-                    </TouchableOpacity>
-                </View>
+                </TouchableOpacity>
+              </View>
             </View>
+          </View>
         </View>
-      </View>
       </ScrollView>
     </KeyboardAvoidingView>
-    )
+  )
 }

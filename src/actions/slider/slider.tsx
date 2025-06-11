@@ -12,7 +12,6 @@ export const appleLogin = async (email: string, password: any) => {
         email: email,
         password: password,
     }
-    console.log("this is applelogin", data);
     const responseData = await apiService.postlogin(`${API_URL}/api/user/appleloginuser`, data)
     return responseData;
 }
@@ -21,7 +20,8 @@ export const appleregister = async (email: string, firstName: string, lastname: 
         email: email,
         password: password,
         firstname: firstName,
-        lastname: lastname
+        lastname: lastname,
+        type: "apple"
     }
     const responseData = await apiService.postregister(`${API_URL}/api/user/register`, data)
     return responseData;

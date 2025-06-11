@@ -67,7 +67,6 @@ export default function AvatarUpload() {
                 const downloadUrl = await firebase.storage().ref(`uploads/${filename}`).getDownloadURL();
                 console.log("this si download url", downloadUrl);
                 const responseData = await updateUser(user._id, downloadUrl);
-                console.log("thsis i responseData0", responseData);
                 if (responseData.avatarUrl) {
                     const userInfo = await getMe();            
                     dispatch(setUser(userInfo)); 

@@ -1,46 +1,51 @@
 // NotificationHandler.tsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Notifications from 'expo-notifications';
 
 interface NotificationHandlerProps {
   streaks: number;
-  scheduleForTomorrow: boolean; // New prop to determine notification schedule
+  scheduleForTomorrow: boolean;
   message: string;
 }
 
 const NotificationHandler: React.FC<NotificationHandlerProps> = ({ streaks, scheduleForTomorrow, message }) => {
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+
+  // Request notification permissions ONCE on mount
   useEffect(() => {
-    if (streaks > 0) {
-      scheduleNotification(streaks, scheduleForTomorrow);
-    }
-  }, [streaks, scheduleForTomorrow]);
+    const requestPermission = async () => {
+      // const { status } = await Notifications.requestPermissionsAsync();
+      setHasPermission(true);
+      // setHasPermission(status === 'granted');
+    };
 
-  const scheduleNotification = async (streaks: number, isTomorrow: boolean) => {
-    const { status } = await Notifications.requestPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Notification permissions are required to send notifications.');
-      return;
-    }
+    requestPermission();
+  }, []);
 
+  // Only schedule notification if we have permission and valid streak
+  useEffect(() => {
+    if (hasPermission && streaks > 0) {
+      scheduleNotification(scheduleForTomorrow);
+    }
+  }, [hasPermission, streaks, scheduleForTomorrow]);
+
+  const scheduleNotification = async (isTomorrow: boolean) => {
     await Notifications.cancelAllScheduledNotificationsAsync();
 
     const triggerDate = new Date();
-    triggerDate.setHours(7); // 4 PM
+    triggerDate.setHours(7); // 7 AM
     triggerDate.setMinutes(0);
     triggerDate.setSeconds(0);
     triggerDate.setMilliseconds(0);
 
-    if (isTomorrow) {
-      triggerDate.setDate(triggerDate.getDate() + 1); // Schedule for tomorrow
-    } else if (triggerDate < new Date()) {
-      // If scheduling for today but the time has already passed, schedule for tomorrow
+    if (isTomorrow || triggerDate < new Date()) {
       triggerDate.setDate(triggerDate.getDate() + 1);
     }
 
     await Notifications.scheduleNotificationAsync({
       content: {
         title: 'Streak Reminder!',
-        body: `${message}`,
+        body: message,
         sound: 'default',
       },
       trigger: {
@@ -49,7 +54,7 @@ const NotificationHandler: React.FC<NotificationHandlerProps> = ({ streaks, sche
     });
   };
 
-  return null; // No UI needed
+  return null;
 };
 
 export default NotificationHandler;

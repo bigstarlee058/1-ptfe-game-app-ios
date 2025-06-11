@@ -56,7 +56,6 @@ class ApiService {
           return response;
         },
         (error) => {
-          console.log("Error in response", error);
           return Promise.reject(error);
         }
       );
@@ -102,7 +101,6 @@ class ApiService {
       return response["data"];
     } catch (error) {
       console.error("Error:", error);
-      Alert.alert("Error", "Failed to load slides. Please try again later.");
       throw error;
     }
   }
@@ -122,7 +120,6 @@ class ApiService {
       return response["data"];
     } catch (error) {
       console.error("Error:", error);
-      Alert.alert("Error", "Failed to login.");
       throw error;
     }
   }
@@ -142,7 +139,11 @@ class ApiService {
       return response["data"];
     } catch (error) {
       console.error("Error:", error);
-      Alert.alert("Error", "Failed to register.");
+      Alert.alert(
+        "Register Error",
+        "Failed to register. Please try again",
+        [{ text: "OK" }]
+      );
       throw error;
     }
   }
@@ -160,7 +161,6 @@ class ApiService {
       return response["data"];
     } catch (error) {
       console.error("Error:", error);
-      Alert.alert("Error", "Failed to fetch category data.");
       throw error;
     }
   }

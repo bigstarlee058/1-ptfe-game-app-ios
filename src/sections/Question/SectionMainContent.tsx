@@ -248,8 +248,17 @@ export default function SectionMainContent({
         if (currentProb >= probCount - 1) {
             const hasTakenQuizToday = checkIfUserHastakenQuizToday(user)
             setTestEnded(true);
-
             if (hasTakenQuizToday) {
+                navigation.navigate("Score", {
+                    id: quizID,
+                    submitData: submitData,
+                    title: quizData.title,
+                    score: currentScore,
+                    quizMode: quizModes.classicMode,
+                    numberOfQuestions: currentProb + 1,
+                    category: "All Questions"
+                });
+            } else if(user.uid == -1){
                 navigation.navigate("Score", {
                     id: quizID,
                     submitData: submitData,

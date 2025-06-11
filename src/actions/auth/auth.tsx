@@ -4,20 +4,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const API_URL = "https://ptfe-game-backend-a0cc7b8d3a77.herokuapp.com";
 const API_SSO_URL = "https://ninja.ptfinalexam.com";
 
-// export const login = async (email: any, password: any) => {
-//   try {
-//     const userCredential = await auth.signInWithEmailAndPassword(
-//       email,
-//       password
-//     );
-//     const user = userCredential.user;
-//     console.log("LOGIN RES ", JSON.stringify(user))
-//     return user;
-//   } catch (error: any) {
-//     console.log(error.message);
-//     throw error;
-//   }
-// };
 
 export const login = async (username: string, password: string) => {
   const queryParams = new URLSearchParams({ username, password }).toString();
@@ -42,11 +28,9 @@ export const login = async (username: string, password: string) => {
 
     const user = await response.json();
     await AsyncStorage.setItem("token", user?.token);
-    console.log("LOGIN RES ", JSON.stringify(user));
     return user;
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.log(error.message);
       throw error;
     }
 
@@ -80,11 +64,9 @@ export const appleloginuser = async (username: string, password: string) => {
 
     const user = await response.json();
     await AsyncStorage.setItem("token", user?.token);
-    console.log("LOGIN RES ", JSON.stringify(user));
     return user;
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.log(error.message);
       throw error;
     }
 
@@ -110,7 +92,6 @@ export const resetPassReq = async (email: string) => {
     const data = await response.json();
 
     if (data.message === "Password reset email has been sent.") {
-      console.log(data.message);
       return true;
     } else {
       console.error("Failed to send password reset email:", data.message);
@@ -118,7 +99,6 @@ export const resetPassReq = async (email: string) => {
     }
   } catch (error) {
     if (error instanceof Error) {
-      console.log(error.message);
       throw error;
     }
 
@@ -154,12 +134,10 @@ export const signup = async (email: string, password: string) => {
       email,
       password
     );
-    console.log(userCredential.user);
 
     await emailVerification();
 
     const user = userCredential.user;
-    console.log("User registered:", user);
     return user;
   } catch (error) {
     throw error;

@@ -6,7 +6,8 @@ import styles from "./WelcomeStyle";
 import { getAllSliders } from "src/actions/slider/slider";
 
 type Props = {
-    onClick: () => void;   // This seems to be used for the login button
+    onClick: () => void;  
+    onRegister: () => void; // This seems to be used for the login button
 }
 
 type Slider = {
@@ -14,7 +15,7 @@ type Slider = {
     content: string;
 };
 
-const SectionWelcome: React.FC<Props> = ({ onClick }) => {
+const SectionWelcome: React.FC<Props> = ({ onClick, onRegister }) => {
     const [slides, setSlides] = useState<Slider[]>([]);
     const sliderIndex: { id: number; }[] = [];
 
@@ -52,13 +53,13 @@ const SectionWelcome: React.FC<Props> = ({ onClick }) => {
                 />
             </View>
             <View style={styles.textButtonContainer}>
-                {/* <Text style={styles.text}>Not registered yet?    </Text>
+                <Text style={styles.text}>Not registered yet?    </Text>
                 <PTFELinkButton
                     text="Register here"
                     color="#FF675B"
                     underlined={false}
-                    onClick={openLink}
-                /> */}
+                    onClick={onRegister}
+                />
             </View>
         </View>
     );

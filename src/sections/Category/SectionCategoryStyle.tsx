@@ -12,7 +12,7 @@ export default StyleSheet.create({
         borderTopLeftRadius: scale(28),
         borderTopRightRadius: scale(28),
         padding: scale(28),
-
+        paddingBottom: scale(150),
         backgroundColor: "white",
     },
     categoryText: {

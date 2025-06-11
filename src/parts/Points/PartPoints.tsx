@@ -65,7 +65,7 @@ export default function PartPoints({ isLoading, setIsLoading }: Props) {
   const [survivorMode, setSurvivorMode] = useState(0);
   const [displaySeason, setDisplaySeason] = useState(1);
   const getDisplaySeason = () => {
-    const startDate = new Date('2024-10-01'); // November 1, 2024
+    const startDate = new Date('2024-3-01'); // November 1, 2024
     const currentDate = new Date();
     
     // Calculate the month difference

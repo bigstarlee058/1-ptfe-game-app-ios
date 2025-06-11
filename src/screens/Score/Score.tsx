@@ -38,7 +38,7 @@ export default function Score({ route, navigation }: Props) {
   const [currentScore, setCurrentScore] = useState(score);
   const dispatch = useDispatch();
   const { setGameState, setsubmitState, submitState } = useGameMode();
-
+  const { user } = useSelector((state: any) => state.userData);
   const submitResult = useCallback(async () => {
     try {
       const result = await postSubmitQuizResult({
@@ -62,7 +62,7 @@ export default function Score({ route, navigation }: Props) {
 
   useFocusEffect(
     useCallback(() => {
-      if (submitState == 1) {
+      if (submitState == 1 && user.uid != -1) {
         submitResult();
       }
 
@@ -75,6 +75,7 @@ export default function Score({ route, navigation }: Props) {
 
   const gotoDashboard = useCallback(() => {
     setGameState(1);
+    console.log("this si test")
     navigation.navigate("Home");
   }, [navigation]);
 

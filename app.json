@@ -2,7 +2,7 @@
   "expo": {
     "name": "NPTE Ninja",
     "slug": "ptfe-game",
-    "version": "1.0.7",
+    "version": "1.0.24",
     "orientation": "portrait",
     "icon": "./assets/icon.jpg",
     "userInterfaceStyle": "light",
@@ -21,22 +21,27 @@
       "infoPlist": {
         "NSUserNotificationUsageDescription": "This app uses notifications to send you daily reminders.",
         "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": false,
+          "NSAllowsArbitraryLoadsForMedia": true,
           "NSExceptionDomains": {
             "vimeo.com": {
               "NSIncludesSubdomains": true,
-              "NSExceptionAllowsInsecureHTTPLoads": false,
-              "NSRequiresCertificateTransparency": false
+              "NSExceptionAllowsInsecureHTTPLoads": false
             },
             "api.vimeo.com": {
               "NSIncludesSubdomains": true,
-              "NSExceptionAllowsInsecureHTTPLoads": false,
-              "NSRequiresCertificateTransparency": false
+              "NSExceptionAllowsInsecureHTTPLoads": false
             }
           }
-        }
-      }
+        },
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "ITSAppUsesNonExemptEncryption": false
     },
     "android": {
+      "permissions": [
+        "com.android.vending.BILLING"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.jpg",
         "backgroundColor": "#ffffff"
@@ -49,7 +54,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "077a37b2-46df-43e4-a09e-63bc871f67d3"
+        "projectId": "ad86b695-2a8e-43bf-8b34-f9ffcbcf197c"
       }
     },
     "plugins": [
@@ -63,6 +68,7 @@
           }
         }
       ]
-    ]
+    ],
+    "owner": "developer1129"
   }
 }

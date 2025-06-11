@@ -18,7 +18,7 @@ export default function SectionHeaderX({
 
     const navigation: any = useNavigation();
     const gotoDashboard = useCallback(() => {
-        navigation.navigate("profile");
+        console.log("this is test")
     }, [navigation]);
 
     

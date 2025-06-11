@@ -1,9 +1,11 @@
-import React from "react";
+import React, {useState} from "react";
 import { View, Text } from "react-native";
 
 import { PTFECheckBox } from "src/components/button";
 import { PTFELinkButton } from "src/components/button";
 import { PTFEEdit } from "src/components/edit";
+import PartEmail from "src/parts/Auth/PartEmail";
+import PartPassword from "./PartPassword";
 
 import globalStyle from "src/theme/globalStyle";
 import styles from "./PartLoginStyle";
@@ -16,8 +18,9 @@ type Props = {
     password: string;
     setEmail: React.Dispatch<React.SetStateAction<string>>;
     setPassword: React.Dispatch<React.SetStateAction<string>>;
+    SetcPassword: React.Dispatch<React.SetStateAction<string>>;
 }
-
+console.log("this test");
 export default function PartLogin({
     onForgetPassword,
     rememberMe,
@@ -26,7 +29,9 @@ export default function PartLogin({
     password,
     setEmail,
     setPassword,
+    SetcPassword
 }: Props) {
+    const [test, setTest] = useState("");
     return(
         <>
             <View style={styles.container}>
@@ -36,22 +41,17 @@ export default function PartLogin({
                 <Text style={styles.subtitle}>
                     Email Address
                 </Text>
-                <PTFEEdit 
-                    type="email"
-                    initValue={email}
-                    onChangeText={setEmail}
+                <PartEmail 
+                    email={email}
+                    setEmail={setEmail}
                 />
-
-                <View style={{height: 23}}/>
                 <Text style={styles.subtitle}>
                     Password
                 </Text>
-                <PTFEEdit 
-                    type="password"
-                    initValue={password}
-                    onChangeText={setPassword}
+                <PartPassword
+                    password={password}
+                    setPassword={setPassword}
                 />
-                
                 <View style={styles.rememberSection}>
                     {/* <PTFECheckBox
                         text="Remember me"

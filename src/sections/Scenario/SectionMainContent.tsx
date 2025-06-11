@@ -13,11 +13,12 @@ import { useGameMode } from '../../../GameModeContext';
 import { Entypo } from "@expo/vector-icons";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import Toast from "react-native-simple-toast";
-
+import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
 import { PTFEButton } from "src/components/button";
 
 import PartAnswer from "src/parts/Question/PartAnswer";
 import styles from "./SectionMainContentStyle";
+import RenderHtml from 'react-native-render-html';
 
 import { moderateScale, scale, verticalScale } from "src/config/scale";
 import {
@@ -38,6 +39,7 @@ import {
 import { useSelector } from "react-redux";
 
 import HTMLView from "react-native-htmlview";
+import { WebView } from 'react-native-webview';
 
 type Answer = {
   questionId: string;
@@ -115,6 +117,13 @@ export default function SectionMainContent({
 
   const [scenarioModalVisible, setScenarioModalVisible] = useState(false);
 
+  const [image, setImage] = useState("");
+
+  const [videoId, setVideoId] = useState("");
+
+  const player = React.useRef<Video | null>(null); // Type the reference here
+  const [status, setStatus] = useState({});
+
   useEffect(() => {
     if (quizID == undefined) {
       return;
@@ -143,13 +152,17 @@ export default function SectionMainContent({
   useFocusEffect(React.useCallback(() => {}, [quizID, refresh]));
 
   const goToSetting = useCallback(() => {
-    navigation.navigate("SettingScreen");
+    // navigation.navigate("Profile", {
+    //   screen: "SettingScreen",
+    // });
+    navigation.navigate("Profile", {
+      screen: "Billing",
+      params: { home: false, userid: user._id, isFromRegister: false },
+    });
   }, [navigation]);
 
   const fetchQuizDetail = useCallback(async () => {
     const data = await getAllScenarioQuestions(quizID);
-    console.log("this is scenario page", data);
-    console.log("this is scenario page", setCategoryState);
     if (data.success == false) {
       if (setCategoryState === 1) {
         Toast.show(
@@ -346,6 +359,17 @@ export default function SectionMainContent({
           answers: submitAnswers,
           topic: topics
         });
+      } else if (user.uid == -1) {
+        navigation.navigate("Score", {
+          id: quizID,
+          submitData: submitData,
+          title: gameModeString[index],
+          score: currentScore,
+          quizMode: quizModes.scenarioMode,
+          numberOfQuestions: currentProb + 1,
+          answers: submitAnswers,
+          topic: topics
+        });
       } else {
         navigation.navigate("CurrentStreak", {
           id: quizID,
@@ -514,9 +538,13 @@ export default function SectionMainContent({
           </TouchableWithoutFeedback>
           <View style={styles.modalContent}>
             <ScrollView style={styles.scrollView}>
-              <Text style={styles.title}>{`  Scenario`}</Text>
+              <Text style={styles.title}>{`Scenario`}</Text>
               {/* <Text style={styles.title}>{scenario}</Text> */}
-              <HTMLView value={scenario} />
+              {/* <HTMLView value={scenario} /> */}
+              <RenderHtml
+                contentWidth={200}
+                source={{ html: scenario }}
+              />
               <View style={styles.space8}></View>
             </ScrollView>
             <View style={styles.space16}></View>

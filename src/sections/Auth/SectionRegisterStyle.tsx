@@ -29,9 +29,10 @@ export default StyleSheet.create({
         marginTop: verticalScale(16)
     },
     textContainer: {
-        marginTop: verticalScale(16),
+        marginTop: verticalScale(10),
         flexDirection: "column",
         justifyContent: "space-evenly",
+        marginBottom: verticalScale(10),
     },
     text: {
         fontFamily: "circular-std-medium",

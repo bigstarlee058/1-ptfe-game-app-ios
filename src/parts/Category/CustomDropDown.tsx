@@ -16,7 +16,7 @@ type Props = {
 const CustomDropdown = ({ options, onSelect, title, page }: Props) => {
   const [selectedValue, setSelectedValue] = useState(null);
   const [dropDownList, setDropDownList] = useState(options);
-  const dropDownRef = useRef(null);
+  const dropDownRef = useRef<SelectDropdown | null>(null);
 
   useEffect(() => {
     setDropDownList([{ title: 'All Categories', value: 'all', isCategory: true, isSelected: true }, ...options]);
@@ -235,7 +235,11 @@ const CustomDropdown = ({ options, onSelect, title, page }: Props) => {
                       text="CONFIRM"
                       type="rounded"
                       color="#FF675B"
-                      onClick={() => dropDownRef.current.closeDropdown()}
+                      onClick={() => {
+                        if (dropDownRef.current) {
+                          dropDownRef.current.closeDropdown();
+                        }
+                      }}
                     />
                   </View>
                 }
@@ -282,6 +286,7 @@ const styles = StyleSheet.create({
   dropdownMenuStyle: {
     backgroundColor: "#E9ECEF",
     borderRadius: moderateScale(8),
+    height: moderateScale(250),
   },
   dropdownItemStyle: {
     width: "100%",

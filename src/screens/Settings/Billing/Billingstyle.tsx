@@ -63,8 +63,8 @@ export default StyleSheet.create({
     backgroundColor: "#FFFFFF24",
   },
   sectionLogin: {
-    marginTop: verticalScale(80),
-    height: verticalScale(630),
+    marginTop: verticalScale(60),
+    // height: verticalScale(630),
     width: "100%",
   },
   sectionStartImage: {
@@ -173,10 +173,10 @@ featureContainer: {
     
   },
   activeButton: {
-    backgroundColor: "#87c6e8",
+    backgroundColor: "#11c1e3",
   },
   toggleText: {
-    fontSize: scale(16),
+    fontSize: scale(20),
     color: "#555",
     marginLeft: scale(12),
     fontWeight: "bold",
@@ -202,10 +202,10 @@ featureContainer: {
     width: "100%",
   },
   activePlan: {
-    backgroundColor: "#87c6e8",
+    backgroundColor: "#11c1e3",
   },
   planText: {
-    fontSize: scale(16),
+    fontSize: scale(20),
     color: "#555",
     fontWeight: "bold",
     marginLeft: scale(16),
@@ -232,7 +232,7 @@ featureContainer: {
     height: scale(12),
     width: scale(12),
     borderRadius: scale(6),
-    backgroundColor: "#87c6e8",
+    backgroundColor: "#11c1e3",
   },
   buttonContainer: {
     width: "100%",

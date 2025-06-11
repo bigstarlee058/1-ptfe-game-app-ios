@@ -32,6 +32,7 @@ export default StyleSheet.create({
     height: verticalScale(450),
     borderRadius: moderateScale(12),
     backgroundColor: "grey",
+    marginTop: moderateScale(8),
   },
   video: {
     width: '100%',

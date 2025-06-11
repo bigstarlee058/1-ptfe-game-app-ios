@@ -11,8 +11,15 @@ import { useFocusEffect } from "@react-navigation/native";
 import { PTFELoading } from "src/components/loading";
 
 export default function Ranking() {
+    const startDate = new Date('2025-03-01'); // November 1, 2024
     const currentDate = new Date();
-    const currentSeason = Math.ceil(currentDate.getMonth() / 3);
+    
+    // Calculate the month difference
+    const monthDiff = (currentDate.getFullYear() - startDate.getFullYear()) * 12 + (currentDate.getMonth() - startDate.getMonth());
+    
+    // Calculate the current season
+    const seasonIndex = Math.floor(monthDiff / 3);
+    const currentSeason = seasonIndex + 1; // Seasons start from 1
 
     const [season, SetSeason] = useState(currentSeason);
     const [gameMode, SetGameMode] = useState("");

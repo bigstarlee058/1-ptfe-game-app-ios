@@ -49,7 +49,7 @@ export function TopSection({
 
     const [displaySeason, setDisplaySeason] = useState(1);
     const getDisplaySeason = () => {
-        const startDate = new Date('2024-10-01'); // November 1, 2024
+        const startDate = new Date('2025-03-01'); // November 1, 2024
         const currentDate = new Date();
         
         // Calculate the month difference

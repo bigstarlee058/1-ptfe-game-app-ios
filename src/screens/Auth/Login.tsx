@@ -43,6 +43,7 @@ export default function Login() {
   const [rememberMe, SetRememberMe] = useState(false);
   const [email, SetEmail] = useState<string>("");
   const [password, SetPassword] = useState<string>("");
+  const [cpassword, SetcPassword] = useState<string>("");
 
   useEffect(() => {
     getLoginCredentialFromStorage();
@@ -65,6 +66,58 @@ export default function Login() {
     }
   };
 
+  // const handleLogin = useCallback(async () => {
+  //   setIsLoading(true);
+  
+  //   const processLogin = async (loginFunction: (username: string, password: string) => Promise<any>) => {
+  //     try {
+  //       const user = await loginFunction(email, password);
+  //       if (user?.token) {
+  //         try {
+            
+  //           const userInfo = await getMe();
+            
+  //           dispatch(setUser(userInfo)); // Set the user info in Redux
+  //           const notification = true;
+  //           try {
+  //             await AsyncStorage.setItem("savedEmail", email);
+  //             await AsyncStorage.setItem("savedPassword", password);
+  //             await AsyncStorage.setItem(
+  //               "notificationPreference",
+  //               JSON.stringify(notification)
+  //             );
+  //           } catch (storageError) {
+  //             console.error("Failed to save data to AsyncStorage:", storageError);
+  //           }
+
+  //           navigation.navigate("Main");
+  //           return true;
+  //         } catch (getMeError) {
+  //           console.error("Failed to fetch user info:", getMeError);
+  //         }
+  //       }
+  //     } catch (error: any) {
+  //       console.log(`Error during login: ${error.message}`);
+  //     }
+  //     return false;
+  //   };
+  
+  //   try {
+  //     const isWordPressLoginSuccessful = await processLogin(login);
+  //     if (!isWordPressLoginSuccessful) {
+  //       const isAppleLoginSuccessful = await processLogin(appleLogin);
+  //       if (!isAppleLoginSuccessful) {
+  //         await logout();
+  //         loginErrorHandler(new Error("Credential incorrect, Please use correct Email address and password."));
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.log("this is test");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // }, [email, password]);
+
   const handleLogin = useCallback(async () => {
     setIsLoading(true);
   
@@ -72,46 +125,48 @@ export default function Login() {
       try {
         const user = await loginFunction(email, password);
         if (user?.token) {
+          const userInfo = await getMe().catch((error) => {
+            console.error("Failed to fetch user info:", error);
+            throw new Error("User information could not be retrieved.");
+          });
+  
+          dispatch(setUser(userInfo)); // Set the user info in Redux
+  
           try {
-            
-            const userInfo = await getMe();
-            
-            dispatch(setUser(userInfo)); // Set the user info in Redux
-            const notification = true;
-            try {
-              await AsyncStorage.setItem("savedEmail", email);
-              await AsyncStorage.setItem("savedPassword", password);
-              await AsyncStorage.setItem(
-                "notificationPreference",
-                JSON.stringify(notification)
-              );
-            } catch (storageError) {
-              console.error("Failed to save data to AsyncStorage:", storageError);
-            }
-
-            navigation.navigate("Main");
-            return true;
-          } catch (getMeError) {
-            console.error("Failed to fetch user info:", getMeError);
+            await AsyncStorage.multiSet([
+              ["savedEmail", email],
+              ["savedPassword", password],
+              ["notificationPreference", JSON.stringify(true)]
+            ]);
+          } catch (storageError) {
+            console.error("Failed to save data to AsyncStorage:", storageError);
           }
+          if (userInfo.uid == -1) {
+            navigation.navigate("Billing", {
+              userid: userInfo._id,
+              home: true,
+            });
+          } else {
+            navigation.navigate("Main");
+          }          
+          return true;
         }
       } catch (error: any) {
-        console.log(`Error during login: ${error.message}`);
+        console.error(`Error during login: ${error.message}`);
+        return false;
       }
       return false;
     };
   
     try {
-      const isWordPressLoginSuccessful = await processLogin(appleLogin);
-      if (!isWordPressLoginSuccessful) {
-        const isAppleLoginSuccessful = await processLogin(login);
-        if (!isAppleLoginSuccessful) {
+      if (!(await processLogin(login))) {
+        if (!(await processLogin(appleLogin))) {
           await logout();
-          loginErrorHandler(new Error("Both WordPress and Apple logins failed"));
+          loginErrorHandler(new Error("Credential incorrect, Please use correct Email address and password."));
         }
       }
     } catch (error) {
-      console.log("this is test");
+      console.error("Unexpected error during login:", error);
     } finally {
       setIsLoading(false);
     }
@@ -120,35 +175,11 @@ export default function Login() {
 
 
   const loginErrorHandler = (error: any) => {
-    if (
-      error.message === "auth/invalid-email" || 
-      error.message === "auth/invalid-credential" || 
-      error.message === "[jwt_auth] invalid_email" || "[jwt_auth] invalid_username"
-    ) {
-      Alert.alert(
-        "Login Error",
-        `Invalid email or password.\nPlease choose a different email.`,
-        [{ text: "OK" }]
-      );
-    } else if (error.message === "auth/too-many-requests") {
-      Alert.alert(
-        "Login Error",
-        `Too many unsuccessful login attempts.\nPlease try again later.`,
-        [{ text: "OK" }]
-      );
-    } else if (error.message === "[jwt_auth] incorrect_password") {
-      Alert.alert(
-        "Login Error",
-        `Incorrect password. Please try again.`,
-        [{ text: "OK" }]
-      );
-    } else {
-      Alert.alert(
-        "Login Error",
-        `Sign-in error: ${error.message}`,
-        [{ text: "OK" }]
-      );
-    }
+    Alert.alert(
+      "Login Error",
+      "Credential incorrect, Please use correct Email address and password.",
+      [{ text: "OK" }]
+    );
   };
   
   
@@ -162,7 +193,7 @@ export default function Login() {
   };
 
   const goBack = useCallback(() => {
-    navigation.navigate("Welcome");
+    navigation.navigate("welcome");
   }, [navigation]);
 
   return (
@@ -207,6 +238,7 @@ export default function Login() {
             password={password}
             setEmail={SetEmail}
             setPassword={SetPassword}
+            SetcPassword={SetcPassword}
           />
         </View>
         {isLoading && <PTFELoading />}

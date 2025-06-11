@@ -9,6 +9,7 @@ import styles from "./SettingScreenStyle";
 import { scale } from "src/config/scale";
 import apiService from "src/actions/middleware/apiService";
 import { useSelector } from "react-redux";
+import { useGameMode } from "GameModeContext";
 
 type props = {
   route?: any;
@@ -19,13 +20,15 @@ export default function SettingScreen({ route, navigation }: props) {
   const [token, setToken] = useState<string | null>(null);
   const [userType, setUserType] = useState<String>("web");
   const { user } = useSelector((state: any) => state.userData);
-
+  const {setsubmitState, setCategoryState, setSetCategoryState} = useGameMode();
+  console.log("this is userType", user);
   useEffect(() => {
     const fetchToken = async () => {
       const tokenFrom = await AsyncStorage.getItem("token");
       
-      if(user.userType) {
+      if(user.userType) {        
         setUserType(user.userType);
+        console.log(user.userType)
       };
       setToken(tokenFrom);
     };
@@ -49,7 +52,8 @@ export default function SettingScreen({ route, navigation }: props) {
     console.log(user);
     navigation.navigate("Billing", {
       isFromRegister: false,
-      userid: user._id
+      userid: user._id,
+      home: false
     });
   }, [navigation]);
   const handleSSOLogin = async (token: string | null) => {
@@ -81,12 +85,13 @@ export default function SettingScreen({ route, navigation }: props) {
     [navigation]
   );
   const goback = useCallback(() => {
-    navigation.goBack();
+    navigation.navigate("ProfileScr");
   }, [navigation]);
 
   const onSignOut = useCallback(async () => {
     try {
       await AsyncStorage.clear();
+      setSetCategoryState(0);
       await logout();
       console.log('All data cleared');
     } catch (error) {
@@ -187,7 +192,7 @@ export default function SettingScreen({ route, navigation }: props) {
                 height={buttonHeight}
               />
               <PTFEButton
-                text="Delete the accounts?"
+                text="Delete the account?"
                 type="rounded"
                 color="#87C6E8"
                 onClick={() => {

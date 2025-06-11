@@ -32,17 +32,24 @@ export default function PTFEEdit({
                 />
             )
             break;
+        case 'hidden':
+            return (
+                <TextInput style={styles.hidden} 
+                    value={initValue}
+                    onChangeText={onChangeText}
+                    autoCorrect={true}
+                    textContentType={"emailAddress"}
+                />
+            )
+            break;   
         case 'email':
             return (                
                 <View style={styles.emailContainer}>
                     <TextInput 
-                        keyboardType="email-address"
-                        textContentType="none"
-                        autoComplete="off"
-                        autoCapitalize="none"
                         autoCorrect={false}
                         style={styles.email}
                         value={initValue}
+                        textContentType={"password"}
                         onChangeText={onChangeText}
                     />
                     <NinjaEmailIcon />
@@ -110,6 +117,11 @@ const styles = StyleSheet.create({
         fontFamily: 'poppins-regular',
         color: "#333333",
         fontSize: moderateScale(16),
+    },
+    hidden: {
+        flex: 1,
+        opacity: 0,
+        height: scale(10),
     },
     multiline: {
         width: "100%",

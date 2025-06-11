@@ -1,17 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View, Text, ScrollView, Alert } from "react-native";
+import { View, Text, ScrollView, Image, TouchableOpacity, GestureResponderEvent, PanResponder, Animated, LayoutChangeEvent  } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import { Entypo } from "@expo/vector-icons";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { useGameMode } from '../../../GameModeContext';
-
+import { Video, ResizeMode, AVPlaybackStatus, AVPlaybackStatusError, AVPlaybackStatusSuccess } from 'expo-av';
 import { PTFEButton } from "src/components/button";
 import Toast from "react-native-simple-toast";
-
+import { Ionicons } from '@expo/vector-icons'; 
 import PartAnswer from "src/parts/Question/PartAnswer";
 import styles from "./SectionMainContentStyle";
-
+import { WebView } from 'react-native-webview';
+// import Video from 'react-native-video';
 import { getQuizDataDetail } from "src/actions/quiz/quiz";
 import { moderateScale, scale, verticalScale } from "src/config/scale";
 import { PTFELoading } from "src/components/loading";
@@ -29,6 +30,8 @@ import { checkIfUserHastakenQuizToday, sleep } from "src/utils/util";
 import { quizModes } from "src/constants/consts";
 import { getAllQuestions } from "src/actions/question/question";
 import { useSelector } from "react-redux";
+import { useVideo } from "src/hooks/useVideo";
+import { useClientVideo } from "src/hooks/useClientVideo";
 
 type Answer = {
   questionId: string;
@@ -47,6 +50,10 @@ type Props = {
   scrollRef: any;
   setCurrentQuizState: (newValue: number) => void;
   topic: string[]
+};
+
+const isAVPlaybackStatusSuccess = (status: AVPlaybackStatus | null): status is AVPlaybackStatusSuccess => {
+  return status !== null && 'isPlaying' in status;
 };
 
 export default function SectionMainContent({
@@ -104,6 +111,12 @@ export default function SectionMainContent({
 
   const [paused, setPaused] = useState(false);
 
+  const [image, setImage] = useState("");
+
+  const [videoId, setVideoId] = useState("");
+
+  const player = React.useRef<Video | null>(null); // Type the reference here
+  const [status, setStatus] = useState<AVPlaybackStatus | AVPlaybackStatusError | null>(null);
   useEffect(() => {
     if (quizID == undefined) {
       return;
@@ -130,15 +143,19 @@ export default function SectionMainContent({
   }, []);
 
   useFocusEffect(React.useCallback(() => {}, [quizID, refresh]));
-
   const goToSetting = useCallback(() => {
-    console.log("Navigating to SettingScreen");
-    navigation.navigate("SettingScreen");
+    // navigation.navigate("Profile", {
+    //   screen: "SettingScreen",
+    // });
+    navigation.navigate("Profile", {
+      screen: "Billing",
+      params: { home: false, userid: user._id, isFromRegister: false },
+    });
   }, [navigation]);
 
   const fetchQuizDetail = useCallback(async () => {
     const data = await getAllQuestions(quizID);
-    console.log("this is classic page", data);
+    
     if (data.success == false) {
       if (setCategoryState === 1) {
         Toast.show(
@@ -210,7 +227,18 @@ export default function SectionMainContent({
         }     
       }
       if (currentQuestion) {
+        console.log("this is classic page", currentQuestion.image, currentQuestion.vimeoId);
         setProblem(currentQuestion.question);
+        if(currentQuestion.image) {
+          setImage(currentQuestion.image);
+        } else {
+          setImage("");
+        }
+        if(currentQuestion.vimeoId) {
+          setVideoId(currentQuestion.vimeoId);
+        } else {
+          setVideoId("");
+        }
         setRationale(currentQuestion.answerExplanation);
         if (currentQuestion.answers) {
           const newAnswers = currentQuestion.answers.map(
@@ -319,25 +347,12 @@ export default function SectionMainContent({
     submitData,
     setSubmitData,
   ]);
-  // const updateSubmitData = useCallback(() => {
-  //   // Check if the current question has already been saved
-  //   const existingIndex = submitData.findIndex((item) => item.question === problem);
-    
-  //   if (existingIndex === -1) { // If not already saved, add it
-  //     const newItem = {
-  //       question: problem,
-  //       answers: answers.map((answer: { index: any; content: any; enabled: any; correct: any; }) => ({
-  //         index: answer.index,
-  //         content: answer.content,
-  //         enabled: answer.enabled,
-  //         correct: answer.correct,
-  //       })),
-  //       answerExplanation: rationale,
-  //     };
-  
-  //     setSubmitData((prevData) => [...prevData, newItem]);
-  //   }
-  // }, [problem, answers, rationale, submitData]);
+  const convertImageUrl = (url: string) => {
+    return url.replace(
+      "https://storage.cloud.google.com",
+      "https://storage.googleapis.com"
+    );
+  };
   
 
   const goNext = () => {
@@ -358,6 +373,17 @@ export default function SectionMainContent({
       const hasTakenQuizToday = checkIfUserHastakenQuizToday(user);
 
       if (hasTakenQuizToday) {
+        navigation.navigate("Score", {
+          id: quizID,
+          submitData: submitData,
+          title: gameModeString[index],
+          score: currentScore,
+          quizMode: quizModes.classicMode,
+          numberOfQuestions: currentProb + 1,
+          answers: submitAnswers,
+          topic: topic
+        });
+      } else if (user.uid == -1) {
         navigation.navigate("Score", {
           id: quizID,
           submitData: submitData,
@@ -429,8 +455,89 @@ export default function SectionMainContent({
     },
     [answers, setAnswers, setSelected, scrollRef]
   );
-  
+  const {thumbnailUrl, videoUrl, video} = useClientVideo(videoId);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [didFinish, setDidFinish] = useState(false);
+  const [progress, setProgress] = useState(0); // Track progress
+  const [duration, setDuration] = useState(0); // Track duration
+  const [barWidth, setBarWidth] = useState(0); // To track the width of the progress bar
+  const progressBarWidth = useRef(new Animated.Value(0)).current; 
+  const [stopStatus, setStopStatus] = useState(false);
 
+  const handlePlay = () => {
+    if (player.current) {
+      player.current.playAsync();
+      setIsVideoPlaying(true);
+      setDidFinish(false);
+      setStopStatus(false);
+    }
+  };
+
+  const handleReplay = () => {
+    if (player.current) {
+      player.current.replayAsync();
+      setIsVideoPlaying(true);
+      setDidFinish(false);
+    }
+  };
+  const handlePause = () => {
+    if (player.current) {
+      player.current.stopAsync();
+      setIsVideoPlaying(false);
+      setDidFinish(true);
+    }
+  };
+
+  const handleStatusUpdate = (status: AVPlaybackStatus) => {
+    setStatus(status);
+
+    // Track progress and duration
+    if (isAVPlaybackStatusSuccess(status)) {
+      if (status.isPlaying) {
+        setIsVideoPlaying(true);
+      }
+
+      // When video finishes, set didFinish to true
+      if (status.didJustFinish) {
+        setDidFinish(true);
+        setIsVideoPlaying(false);
+      }
+
+      if (status.durationMillis) {
+        setDuration(status.durationMillis); // Update duration
+      }
+      if (status.positionMillis && status.durationMillis) {
+        setProgress(status.positionMillis / status.durationMillis); // Calculate progress as a fraction
+        Animated.timing(progressBarWidth, {
+          toValue: (status.positionMillis / status.durationMillis) * 100, // Update progress bar width
+          duration: 100,
+          useNativeDriver: false,
+        }).start();
+      }
+    }
+  };
+
+  const handleSeek = (e: GestureResponderEvent) => {
+    // Calculate where the user tapped on the progress bar
+    const newPosition = e.nativeEvent.locationX / barWidth;
+    const newTime = newPosition * duration;
+    if (player.current) {
+      player.current.setPositionAsync(newTime); // Seek to the new position
+    }
+  };
+
+  const handleLayout = (e: { nativeEvent: { layout: { width: any; }; }; }) => {
+    const width = e.nativeEvent.layout.width; // Get the width of the progress bar
+    setBarWidth(width); // Update the barWidth state with the new width
+  };
+  const handleStop = () => {
+    if (player.current) {
+      player.current.pauseAsync();
+      setIsVideoPlaying(false); // Stop the video
+      setStopStatus(true)
+    }
+  };
+  
   return (
     <View style={styles.container}>
       <View style={styles.timerContainer}>
@@ -455,10 +562,86 @@ export default function SectionMainContent({
             <Text style={styles.questionText}>
               {problem.replace(/\n/g, "").trim()}
             </Text>
-            {/* <View style={styles.videoWrapper}>
-              <View style={styles.vimeoVideoContainer}></View>
-            </View>
-            <View style={styles.photoContainer}></View> */}
+            {
+              videoId?
+              <View style={styles.videoWrapper}>
+                <Video
+                    ref={player}
+                    style={styles.video}
+                    source={{
+                    uri: videoUrl,
+                    }}
+                    useNativeControls={false}
+                    // resizeMode={ResizeMode.CONTAIN}
+                    isLooping={false}
+                    shouldPlay={true}
+                    onPlaybackStatusUpdate={handleStatusUpdate} 
+                    // onPlaybackStatusUpdate={status => setStatus(() => status)}
+                />
+                {!didFinish && !isVideoPlaying && (
+                  <TouchableOpacity style={styles.controlPlayButton} onPress={handlePlay}>
+                    <Ionicons name="play" size={60} color="#fff" />
+                  </TouchableOpacity>
+                )} 
+                {
+                  didFinish || isVideoPlaying ? 
+                <View style={styles.controlsRow}>
+                {
+                  <TouchableOpacity style={styles.controlButton} onPress={handlePause}>
+                    <Ionicons name="stop" size={30} color="#fff" /> 
+                  </TouchableOpacity>
+                }
+                {
+                  isVideoPlaying?           
+                  <TouchableOpacity style={styles.controlButton} onPress={handleStop}>
+                    <Ionicons name="pause" size={30} color="#fff" />
+                  </TouchableOpacity> :
+                  <TouchableOpacity style={styles.controlButton} onPress={handlePlay}>
+                    <Ionicons name="play" size={30} color="#fff" />
+                  </TouchableOpacity>
+                }
+                {
+                  <TouchableOpacity style={styles.controlButton} onPress={handleReplay}>
+                    <Ionicons name="reload" size={30} color="#fff" /> 
+                  </TouchableOpacity>
+                }
+                </View>: null                  
+                }
+                
+                {isVideoPlaying || stopStatus?<View style={styles.progressWrapper}>
+                  <View
+                    style={styles.progressBar}
+                    onStartShouldSetResponder={() => true} // Enable touch handling
+                    onResponderMove={handleSeek} // Capture touch movements on the progress bar
+                    onLayout={handleLayout} // Get layout width for the progress bar
+                  >
+                    <Animated.View
+                      style={[
+                        styles.progress,
+                        {
+                          width: progressBarWidth.interpolate({
+                            inputRange: [0, 100],
+                            outputRange: ['0%', '100%'],
+                          }),
+                        },
+                      ]}
+                    />
+                  </View>
+                </View>:null}
+              </View>: null
+            }
+            {
+              image?             
+              <View style={styles.photoContainer}>
+                <Image
+                  style={styles.image}
+                  source={
+                    {uri: image}
+                  }
+                />
+              </View> : null
+            }
+
           </ScrollView>
         </View>
         {statisticsFlag && (

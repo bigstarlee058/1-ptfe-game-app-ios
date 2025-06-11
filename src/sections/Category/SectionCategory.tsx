@@ -137,7 +137,7 @@ export default function SectionCategory({ gameMode, goBack }: Props) {
               title: subcategory,
               value: subcategory,
               isCategory: false,
-              isSelected: idx === 0 && index === 0, // Adjust as per requirement
+              isSelected: true, // Adjust as per requirement
             })
           ),
         });

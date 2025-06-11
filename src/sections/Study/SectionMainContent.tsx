@@ -5,17 +5,15 @@ import React, {
   useRef,
   useLayoutEffect,
 } from "react";
-import { View, Text, ScrollView, Alert } from "react-native";
+import { View, Text, ScrollView, Alert, Image, TouchableOpacity, Animated, GestureResponderEvent } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import { useGameMode } from '../../../GameModeContext';
-import { Entypo } from "@expo/vector-icons";
+import { Entypo, Ionicons } from "@expo/vector-icons";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
-import { Video, ResizeMode } from "expo-av";
 import Toast from "react-native-simple-toast";
-
+import { Video, ResizeMode, AVPlaybackStatus, AVPlaybackStatusError, AVPlaybackStatusSuccess } from 'expo-av';
 import { PTFEButton, PTFELinkButton } from "src/components/button";
-
 import PartAnswer from "src/parts/Study/PartAnswer";
 import styles from "./SectionMainContentStyle";
 
@@ -30,6 +28,7 @@ import { quiz_test_data } from "assets/@mockup/data";
 import { checkIfUserHastakenQuizToday, sleep } from "src/utils/util";
 import { getAllQuestions } from "src/actions/question/question";
 import { useSelector } from "react-redux";
+import { useClientVideo } from "src/hooks/useClientVideo";
 
 type Props = {
   quizID: string[];
@@ -49,6 +48,9 @@ type Answer = {
   questionId: string;
   isCorrect: boolean;
 };
+const isAVPlaybackStatusSuccess = (status: AVPlaybackStatus | null): status is AVPlaybackStatusSuccess => {
+  return status !== null && 'isPlaying' in status;
+};
 
 export default function SectionMainContent({
   quizID,
@@ -66,8 +68,8 @@ export default function SectionMainContent({
   const navigation: any = useNavigation();
   const {setsubmitState, setCategoryState, setSetCategoryState} = useGameMode();
   const { user } = useSelector((state: any) => state.userData);
-  const [status, setStatus] = useState({});
-  const player = React.useRef(null);
+  const player = React.useRef<Video | null>(null); // Type the reference here
+  const [status, setStatus] = useState<AVPlaybackStatus | AVPlaybackStatusError | null>(null);
   const [submitData, setSubmitData] = useState<any[]>([]);
 
   const [quizState, setQuizState] = useState(0);
@@ -106,6 +108,12 @@ export default function SectionMainContent({
 
   let [matchedCount, setMatchedCount] = useState(0);
   const [totalCount, setTotalCount] = useState(1);
+
+  const [image, setImage] = useState("");
+
+  const [videoId, setVideoId] = useState("");
+
+  
 
   useFocusEffect(
     React.useCallback(() => {
@@ -155,15 +163,22 @@ export default function SectionMainContent({
   useFocusEffect(React.useCallback(() => {}, [quizID, refresh]));
 
   const goToSetting = useCallback(() => {
-    navigation.navigate("SettingScreen");
+    // navigation.navigate("Profile", {
+    //   screen: "SettingScreen",
+    // });
+    navigation.navigate("Profile", {
+      screen: "Billing",
+      params: { home: false, userid: user._id, isFromRegister: false },
+    });
   }, [navigation]);
-
+  
   const fetchQuizDetail = useCallback(async () => {
     const data = await getAllQuestions(
       quizID,
       1,
       numberOfQuestions > 0 ? numberOfQuestions : 20
     );
+    console.log("this is user", data.success, data.state, setCategoryState);
     if (data.success == false) {
       if (setCategoryState === 1) {
         Toast.show(
@@ -258,6 +273,17 @@ export default function SectionMainContent({
       }
       if (currentQuestion) {
         setProblem(currentQuestion.question);
+        console.log("htis is study", currentQuestion.image);
+        if(currentQuestion.image) {
+          setImage(currentQuestion.image);
+        } else {
+          setImage("");
+        }
+        if(currentQuestion.vimeoId) {
+          setVideoId(currentQuestion.vimeoId);
+        } else {
+          setVideoId("");
+        }
         setRationale(currentQuestion.answerExplanation);
         if (currentQuestion.answers) {
           const newAnswers = currentQuestion.answers.map(
@@ -360,6 +386,7 @@ export default function SectionMainContent({
       const isAnswerCorrect = answers.some((answer: { enabled: any; correct: any; }) => answer.enabled && answer.correct);
       
       if (isAnswerCorrect) {
+        setCurrent(currentScore + 1);
         setTickShow(true);
         setCurrentScore(currentScore + 1);
       } else {
@@ -409,7 +436,19 @@ export default function SectionMainContent({
           answers: submitAnswers,
           topic: topics
         });
-      } else {
+      } else if (user.uid == -1) {
+        navigation.navigate("Score", {
+          id: quizID,
+          title: "Study Mode",
+          submitData: submitData,
+          score: currentScore,
+          quizMode: quizModes.studyMode,
+          matchedCount: currentScore,
+          totalCount: numberOfQuestions > 0 ? numberOfQuestions : 20,
+          answers: submitAnswers,
+          topic: topics
+        });
+      }else {
         navigation.navigate("CurrentStreak", {
           id: quizID,
           title: "Study Mode",
@@ -440,7 +479,89 @@ export default function SectionMainContent({
     setTestEnded,
     setCurrentProb,
   ]);
-
+  const {thumbnailUrl, videoUrl, video} = useClientVideo(videoId);
+    const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+    const [didFinish, setDidFinish] = useState(false);
+    const [progress, setProgress] = useState(0); // Track progress
+    const [duration, setDuration] = useState(0); // Track duration
+    const [barWidth, setBarWidth] = useState(0); // To track the width of the progress bar
+    const progressBarWidth = useRef(new Animated.Value(0)).current; 
+    const [stopStatus, setStopStatus] = useState(false);
+  
+    const handlePlay = () => {
+      if (player.current) {
+        player.current.playAsync();
+        setIsVideoPlaying(true);
+        setDidFinish(false);
+        setStopStatus(false);
+      }
+    };
+  
+    const handleReplay = () => {
+      if (player.current) {
+        player.current.replayAsync();
+        setIsVideoPlaying(true);
+        setDidFinish(false);
+      }
+    };
+    const handlePause = () => {
+      if (player.current) {
+        player.current.stopAsync();
+        setIsVideoPlaying(false);
+        setDidFinish(true);
+      }
+    };
+  
+    const handleStatusUpdate = (status: AVPlaybackStatus) => {
+      setStatus(status);
+  
+      // Track progress and duration
+      if (isAVPlaybackStatusSuccess(status)) {
+        if (status.isPlaying) {
+          setIsVideoPlaying(true);
+        }
+  
+        // When video finishes, set didFinish to true
+        if (status.didJustFinish) {
+          setDidFinish(true);
+          setIsVideoPlaying(false);
+        }
+  
+        if (status.durationMillis) {
+          setDuration(status.durationMillis); // Update duration
+        }
+        if (status.positionMillis && status.durationMillis) {
+          setProgress(status.positionMillis / status.durationMillis); // Calculate progress as a fraction
+          Animated.timing(progressBarWidth, {
+            toValue: (status.positionMillis / status.durationMillis) * 100, // Update progress bar width
+            duration: 100,
+            useNativeDriver: false,
+          }).start();
+        }
+      }
+    };
+  
+    const handleSeek = (e: GestureResponderEvent) => {
+      // Calculate where the user tapped on the progress bar
+      const newPosition = e.nativeEvent.locationX / barWidth;
+      const newTime = newPosition * duration;
+      if (player.current) {
+        player.current.setPositionAsync(newTime); // Seek to the new position
+      }
+    };
+  
+    const handleLayout = (e: { nativeEvent: { layout: { width: any; }; }; }) => {
+      const width = e.nativeEvent.layout.width; // Get the width of the progress bar
+      setBarWidth(width); // Update the barWidth state with the new width
+    };
+    const handleStop = () => {
+      if (player.current) {
+        player.current.pauseAsync();
+        setIsVideoPlaying(false); // Stop the video
+        setStopStatus(true)
+      }
+    };
+  
   return (
     <View style={styles.container}>
       {/* <TickAnim
@@ -466,6 +587,85 @@ export default function SectionMainContent({
       <View style={styles.innerContainer}>
         <View style={styles.quizContainer}>
           <Text style={styles.questionText}>{problem.replace(/\n/g, '').trim()}</Text>
+          {
+            videoId?
+              <View style={styles.videoWrapper}>
+                <Video
+                    ref={player}
+                    style={styles.video}
+                    source={{
+                    uri: videoUrl,
+                    }}
+                    useNativeControls={false}
+                    // resizeMode={ResizeMode.CONTAIN}
+                    isLooping={false}
+                    shouldPlay={true}
+                    onPlaybackStatusUpdate={handleStatusUpdate} 
+                    // onPlaybackStatusUpdate={status => setStatus(() => status)}
+                />
+                {!didFinish && !isVideoPlaying && (
+                  <TouchableOpacity style={styles.controlPlayButton} onPress={handlePlay}>
+                    <Ionicons name="play" size={60} color="#fff" />
+                  </TouchableOpacity>
+                )} 
+                {
+                  didFinish || isVideoPlaying ? 
+                <View style={styles.controlsRow}>
+                {
+                  <TouchableOpacity style={styles.controlButton} onPress={handlePause}>
+                    <Ionicons name="stop" size={30} color="#fff" /> 
+                  </TouchableOpacity>
+                }
+                {
+                  isVideoPlaying?           
+                  <TouchableOpacity style={styles.controlButton} onPress={handleStop}>
+                    <Ionicons name="pause" size={30} color="#fff" />
+                  </TouchableOpacity> :
+                  <TouchableOpacity style={styles.controlButton} onPress={handlePlay}>
+                    <Ionicons name="play" size={30} color="#fff" />
+                  </TouchableOpacity>
+                }
+                {
+                  <TouchableOpacity style={styles.controlButton} onPress={handleReplay}>
+                    <Ionicons name="reload" size={30} color="#fff" /> 
+                  </TouchableOpacity>
+                }
+                </View>: null                  
+                }
+                
+                {isVideoPlaying || stopStatus?<View style={styles.progressWrapper}>
+                  <View
+                    style={styles.progressBar}
+                    onStartShouldSetResponder={() => true} // Enable touch handling
+                    onResponderMove={handleSeek} // Capture touch movements on the progress bar
+                    onLayout={handleLayout} // Get layout width for the progress bar
+                  >
+                    <Animated.View
+                      style={[
+                        styles.progress,
+                        {
+                          width: progressBarWidth.interpolate({
+                            inputRange: [0, 100],
+                            outputRange: ['0%', '100%'],
+                          }),
+                        },
+                      ]}
+                    />
+                  </View>
+                </View>:null}
+              </View>: null
+            }
+            {
+              image?             
+              <View style={styles.photoContainer}>
+                <Image
+                  style={styles.image}
+                  source={
+                    {uri: image}
+                  }
+                />
+              </View> : null
+            }
           {/* <View style={styles.videoWrapper}>
             <View style={styles.vimeoVideoContainer}>
               {videoUrl && (

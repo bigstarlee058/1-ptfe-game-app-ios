@@ -101,8 +101,8 @@ export default StyleSheet.create({
     alignSelf: "flex-start",
   },
   title: {
-    textAlign: "left",
-    alignSelf: "flex-start",
+    textAlign: "center",
+    // alignSelf: "flex-start",
     fontFamily: "circular-std-medium",
     fontSize: moderateScale(20),
     padding: scale(8),

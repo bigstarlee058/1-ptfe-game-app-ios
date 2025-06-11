@@ -7,9 +7,9 @@ type VideoData = {
 };
 
 const VIMEO_API_BASE_URL = "https://api.vimeo.com/videos";
-const ACCESS_TOKEN = "e4561dd47432804cb9434a423e8d28f8"; // Replace with your actual token
+const ACCESS_TOKEN = "1db78ccec07239f03f7f3651dec47112"; // Replace with your actual token
 
-export const useVideo = (VIMEO_ID: string): VideoData => {
+export const useClientVideo = (VIMEO_ID: string): VideoData => {
     const [thumbnailUrl, setThumbnailUrl] = useState<string>("");
     const [videoUrl, setVideoUrl] = useState<string>(""); // Direct video file URL
     const [video, setVideo] = useState<any>(null); // Full video metadata

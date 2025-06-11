@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { View, Text } from "react-native";
-
+import { useNavigation } from "@react-navigation/native";
 import { PTFEButton, PTFELinkButton } from "src/components/button";
 import PartRegister from "src/parts/Auth/PartRegister";
 import styles from "./SectionRegisterStyle";
@@ -34,6 +34,12 @@ export default function SectionRegister({
     onRegister,
     onGoBack,
 }: Props) {
+    const navigation:any = useNavigation();
+    const handleGoBack = useCallback(() => {
+        console.log("back login")
+        navigation.navigate('Login');
+        // navigation.navigate("Billing");
+    }, []);
     return(
         <View style={styles.container}>
             <View style={styles.loginFormContainer}>
@@ -65,7 +71,7 @@ export default function SectionRegister({
                         text="Back to login"
                         color="#FF675B"
                         underlined={false}
-                        onClick={onGoBack}
+                        onClick={handleGoBack}
                     />
                     <Text></Text>
                 </View>

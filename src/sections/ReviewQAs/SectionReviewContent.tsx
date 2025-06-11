@@ -20,7 +20,6 @@ export default function SectionReviewContent({
     const [positions, setPositions] = useState<number[]>([]);
     const [scenarioModalVisible, setScenarioModalVisible] = useState(false);
     const [scenario, setScenario] = useState('');
-    console.log("this is reviewQA page", scenario);
 
     const handleLayout = useCallback((index: number, y: number ) => {
         setPositions(prev => {

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Toast from 'react-native-simple-toast';
 
@@ -11,6 +11,8 @@ import styles from "./RegisterStyle";
 import { LinearGradient } from "expo-linear-gradient";
 import CustomKeyboardAvoidingView from "src/wrappers/CustomKeyboardAvoidingView";
 import { appleregister } from "src/actions/slider/slider";
+import { moderateScale } from "src/config/scale";
+import { Entypo } from "@expo/vector-icons";
 
 export default function Register() {    
     const navigation:any = useNavigation();
@@ -39,16 +41,11 @@ export default function Register() {
             // if (user) {
             const user = await appleregister(email, firstName, lastName, password);
             
-            console.log("-----");
-            console.log(user);
             // Alert.alert(`Error", "success to login. 1${user.message}---------`);
             if(user != null) {
                 // navigation.navigate("EmailVerify", { email, password });
-                Toast.show(`Register Successfully!`, Toast.SHORT );
-                navigation.navigate("Billing", {
-                    isFromRegister: true,
-                    userid: user.user._id
-                })
+                Toast.show(`Registered Successfully!`, Toast.SHORT );
+                navigation.navigate('Login');
             }
             // }
         } catch (error: any) {
@@ -68,9 +65,13 @@ export default function Register() {
 
 
     const handleGoBack = useCallback(() => {
+        console.log("back login")
         navigation.navigate('Login');
         // navigation.navigate("Billing");
     }, []);
+      const goBack = useCallback(() => {
+        navigation.goBack();
+      }, [navigation]);
 
     return (
         <KeyboardAvoidingView
@@ -88,6 +89,15 @@ export default function Register() {
                         end={{ x: 1, y: 1 }}
                         style={styles.upperGradientContainer}
                     />
+                    <TouchableOpacity style={styles.backContainer} onPress={goBack}>
+          <View style={styles.back}>
+            <Entypo
+              name="chevron-left"
+              size={moderateScale(20)}
+              color="#FF675B"
+            />
+          </View>
+        </TouchableOpacity>
                     <View style={styles.backgroundCircle1} />
                     <View style={styles.backgroundCircle2} />
                     <View style={styles.backgroundCircle3} />

@@ -16,6 +16,7 @@ type Props = {
     password: string;
     setEmail: React.Dispatch<React.SetStateAction<string>>;
     setPassword: React.Dispatch<React.SetStateAction<string>>;
+    SetcPassword:React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function SectionLogin({
@@ -28,6 +29,7 @@ export default function SectionLogin({
     password,
     setEmail,
     setPassword,
+    SetcPassword
 }: Props) {
 
     const openLink = () => {
@@ -50,6 +52,7 @@ export default function SectionLogin({
                     password={password}
                     setEmail={setEmail}
                     setPassword={setPassword}
+                    SetcPassword={SetcPassword}
                 />
             </View>
 

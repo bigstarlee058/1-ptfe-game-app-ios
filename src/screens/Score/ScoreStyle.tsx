@@ -19,6 +19,7 @@ export default StyleSheet.create({
         zIndex: -1,
     },
     headerContainer: {
+        marginTop: scale(20),
         flex: 8,
         width: "100%",
     },

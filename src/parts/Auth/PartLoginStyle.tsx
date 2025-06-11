@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { moderateScale, verticalScale } from "src/config/scale";
+import { moderateScale, verticalScale, scale } from "src/config/scale";
 
 export default StyleSheet.create({
     container: {
@@ -25,5 +25,56 @@ export default StyleSheet.create({
         alignItems: "center", // Center content vertically
         marginTop: verticalScale(26),
         marginRight: 6, // Optional: Remove if not needed
+    },
+    emailContainer: {
+        width: "100%",
+        height: verticalScale(64),
+        paddingRight: scale(8),
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderColor: "#999999",
+        borderWidth: moderateScale(1),
+        borderRadius: scale(16),
+    },
+    email: {
+        flex: 1,
+        paddingTop: 3,
+        textAlignVertical: "center",
+        paddingHorizontal: scale(16),
+
+        fontFamily: 'poppins-regular',
+        color: "#333333",
+        fontSize: moderateScale(16),
+        // letterSpacing: moderateScale(2),
+    },
+    passwordContainer: {
+        width: "100%",
+        height: verticalScale(64),
+
+        flexDirection: 'row',
+        alignItems: 'center',
+        
+        borderColor: "#999999",
+        borderWidth: moderateScale(1),
+        borderRadius: scale(16),
+    },
+    password: {
+        flex: 1,
+        paddingTop: 3,
+        textAlignVertical: "center",
+        paddingHorizontal: scale(16),
+
+        fontFamily: 'poppins-regular',
+        color: "#333333",
+        fontSize: moderateScale(16),
+        // letterSpacing: moderateScale(2),
+    },
+    toggleButton: {
+        paddingVertical: verticalScale(8),
+        paddingHorizontal: scale(10),
+    },
+    keyboardcontainer: {
+        flex: 1,
+        justifyContent: 'center',
     },
 });
