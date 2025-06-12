@@ -193,7 +193,7 @@ export default function Login() {
   };
 
   const goBack = useCallback(() => {
-    navigation.navigate("welcome");
+    navigation.navigate("Welcome");
   }, [navigation]);
 
   return (
