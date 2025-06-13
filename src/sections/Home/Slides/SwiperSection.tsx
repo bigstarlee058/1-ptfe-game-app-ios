@@ -198,17 +198,18 @@ export default function SwiperSection({ sliderData }: SwiperSectionProps) {
     return (
         <View style={styles.container}>
             <Swiper
-                loop={true}
-                showsPagination={true}
+                loop
+                showsPagination
                 dot={<View style={styles.dot} />}
                 activeDot={<View style={styles.activeDot} />}
                 paginationStyle={{ bottom: scale(250) }}
             >
                 {sliderData.map((slide, index) => (
                     <View key={index} style={styles.slide}>
-                        {index === 0 && <Slide1 title={slide.title} content={slide.content} />}
+                        <Slide1 title={slide.title} content={slide.content} />
+                        {/* {index === 0 && <Slide1 title={slide.title} content={slide.content} />}
                         {index === 1 && <Slide1 title={slide.title} content={slide.content} />}
-                        {index === 2 && <Slide1 title={slide.title} content={slide.content} />}
+                        {index === 2 && <Slide1 title={slide.title} content={slide.content} />} */}
                     </View>
                 ))}
             </Swiper>

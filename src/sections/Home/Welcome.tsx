@@ -42,7 +42,9 @@ const SectionWelcome: React.FC<Props> = ({ onClick, onRegister }) => {
             <View style={styles.activeDotContainer}>
             </View>
             <View style={styles.swiperContainer}>
-                <SwiperSection sliderData={slides}/>
+                {slides.length > 0 &&
+                    <SwiperSection sliderData={slides}/>
+                }
             </View>
             <View style={styles.buttonContainer}>
                 <PTFEButton
