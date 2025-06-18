@@ -89,16 +89,18 @@ export default function SectionReviewContent({
                                 <Text style={styles.questionText}>
                                     {item?.question}
                                 </Text>
-                                <PTFEButton
-                                    text="Show Scenario"
-                                    type="rounded"
-                                    color="#FF675B"
-                                    enabled={false}
-                                    onClick={() => {
-                                        setScenario(item.scenario);
-                                        setScenarioModalVisible(true);
-                                    }}
-                                />
+                                {item.scenario &&
+                                    <PTFEButton
+                                        text="Show Scenario"
+                                        type="rounded"
+                                        color="#FF675B"
+                                        enabled={false}
+                                        onClick={() => {
+                                            setScenario(item.scenario);
+                                            setScenarioModalVisible(true);
+                                        }}
+                                    />
+                                }
                             </View>
                             <View style={styles.answersContainer}>
                                 <Text style={styles.rationaleHeader}>
