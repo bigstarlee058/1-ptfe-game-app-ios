@@ -763,7 +763,7 @@ export default function SectionMainContent({
             </Text>
             <View style={styles.space1}>
               <PTFEButton
-                text={"CLOSE"}
+                text={"Close"}
                 type="rounded"
                 color="#FF675B"
                 height={scale(48)}

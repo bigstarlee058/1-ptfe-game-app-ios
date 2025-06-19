@@ -549,7 +549,7 @@ export default function SectionMainContent({
             </ScrollView>
             <View style={styles.space16}></View>
             <PTFEButton
-              text="CLOSE"
+              text="Close"
               type="circle"
               color="#FF675B"
               onClick={() => {

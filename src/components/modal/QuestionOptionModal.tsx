@@ -88,7 +88,7 @@ const QuestionModal = ({
                     <View style={styles.space1}>
                         <View style={styles.buttonContainer}>
                             <PTFEButton 
-                                text="CLOSE"
+                                text="Close"
                                 type="rounded"
                                 color="#87C6E8"
                                 onClick={() => {
@@ -99,7 +99,7 @@ const QuestionModal = ({
                         </View>
                         <View style={styles.buttonContainer}>
                             <PTFEButton 
-                                text="SELECT"
+                                text="Select"
                                 type="rounded"
                                 color="#FF675B"
                                 onClick={() => {

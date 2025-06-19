@@ -123,14 +123,14 @@ export default function SectionUserFlashCards({
 
                                 <View style={styles.space1}>
                                     <PTFEButton
-                                        text={"DELETE"}
+                                        text={"Delete"}
                                         type="circle"
                                         color="#87C6E8"
                                         onClick={onDeleteHandler}
                                     />
                                 </View>
                                 <PTFEButton
-                                    text="CLOSE"
+                                    text="Close"
                                     type="circle"
                                     color="#FF675B"
                                     onClick={onPressDeleteModalCloseBtn}

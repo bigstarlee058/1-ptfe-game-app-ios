@@ -155,14 +155,14 @@ export default function SectionMainContent({ navigation, titleValue, id, page }:
 
                                         <View style={styles.space1}>
                                             <PTFEButton
-                                                text={"DELETE"}
+                                                text={"Delete"}
                                                 type="circle"
                                                 color="#87C6E8"
                                                 onClick={() => onDeleteHandler(index)}
                                             />
                                         </View>
                                         <PTFEButton
-                                            text="CLOSE"
+                                            text="Close"
                                             type="circle"
                                             color="#FF675B"
                                             onClick={onPressDeleteModalCloseBtn}
@@ -218,7 +218,7 @@ export default function SectionMainContent({ navigation, titleValue, id, page }:
                             />
                         </View>
                         <PTFEButton
-                            text="CLOSE"
+                            text="Close"
                             type="circle"
                             color="#FF675B"
                             onClick={onPressModalCloseBtn}

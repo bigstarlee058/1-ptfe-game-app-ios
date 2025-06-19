@@ -31,7 +31,7 @@ export default function SectionCategory() {
                 </View>
                 <View style={styles.buttonContainer}>
                     <PTFEButton
-                        text="START"
+                        text="Start"
                         type="rounded"
                         color="#FF675B"
                         enabled={title.length == 0}

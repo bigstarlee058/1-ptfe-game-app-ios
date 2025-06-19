@@ -99,7 +99,7 @@ export default function SectionStatus({
               })}
               <View style={styles.space8}>
                 <PTFEButton
-                  text="CLOSE"
+                  text="Close"
                   type="rounded"
                   color="#FF675B"
                   height={verticalScale(56)}
