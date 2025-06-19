@@ -5,6 +5,7 @@ import PartAnswer from "./PartAnswer";
 import styles from "./SectionReviewContentStyle";
 import HTMLView from "react-native-htmlview";
 import { PTFEButton } from "src/components/button";
+import FlagIcon from "assets/icons/FlagIcon";
 
 type Props = {
     quizData?: any,
@@ -130,6 +131,12 @@ export default function SectionReviewContent({
                                 </Text>
                                 <Text style={styles.rationaleText}>
                                     {item.answerExplanation}
+                                </Text>
+                            </View>
+                            <View style={styles.rationaleReportContainer}>
+                                <FlagIcon />
+                                <Text style={styles.rationaleReportText}>
+                                    {"Issue with the question? Let us know. "}
                                 </Text>
                             </View>
                         </View>

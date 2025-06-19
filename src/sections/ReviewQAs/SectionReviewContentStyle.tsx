@@ -67,6 +67,19 @@ export default StyleSheet.create({
         fontSize: moderateScale(20),
         color: "#333333",
     },
+    rationaleReportContainer:{
+        paddingHorizontal: verticalScale(32),
+        flexDirection:'row',
+        flex: 10,
+        marginVertical: verticalScale(12),
+        width: '100%',
+    },
+    rationaleReportText: {
+        fontFamily: 'circular-std-medium',
+        fontSize: moderateScale(15),
+        color: "#FF3B30",
+        marginLeft: 5
+    },
     rationaleText: {
         fontFamily: 'segoe-ui',
         fontSize: moderateScale(18),
