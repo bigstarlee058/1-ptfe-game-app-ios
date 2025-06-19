@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Alert, View } from "react-native";
+import { ActivityIndicator, Alert, View } from "react-native";
 import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
 
 import SectionCategory from "src/sections/Category/SectionCategory";
@@ -30,6 +30,7 @@ export default function Category({
     const [status, setStatus] = useState({});
     const { user } = useSelector((state: any) => state.userData);
     const [video_url, setvideo_url] = useState("");
+    const [isBuffering, setIsBuffering] = useState(true);
 
     useFocusEffect(
         useCallback(() => {
@@ -80,21 +81,34 @@ export default function Category({
                 />
             </View>
             <View style={styles.vimeoVideoContainer}>
-                {
-                    videoUrl && 
-                    <Video
-                        ref={player}
-                        style={styles.video}
-                        source={{
-                        uri: videoUrl,
-                        }}
-                        useNativeControls
-                        resizeMode={ResizeMode.CONTAIN}
-                        isLooping
-                        shouldPlay={true}
-                        onPlaybackStatusUpdate={status => setStatus(() => status)}
-                    />
-                }
+              {isBuffering && (
+                <View style={styles.loaderOverlay}>
+                  <ActivityIndicator size="large" color="#fff" />
+                </View>
+              )}
+              {
+                videoUrl && 
+                  <Video
+                    ref={player}
+                    style={styles.video}
+                    source={{uri: videoUrl}}
+                    useNativeControls
+                    resizeMode={ResizeMode.CONTAIN}
+                    isLooping
+                    shouldPlay={true}
+                    onPlaybackStatusUpdate={status => {
+                      setStatus(() => status);
+                      if (status.isLoaded) {
+                        const buffering =
+                          ('isBuffering' in status && status.isBuffering) ||
+                          (!status.isPlaying && status.shouldPlay);
+                        setIsBuffering(buffering);
+                      } else {
+                        setIsBuffering(true); // still loading
+                      }
+                    }}
+                  />
+              }
             </View>
             <View style={styles.sectionContentSlider}>
                 <SectionCategory 

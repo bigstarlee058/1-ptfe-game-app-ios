@@ -31,11 +31,24 @@ export default StyleSheet.create({
     width: '80%',
     height: verticalScale(450),
     borderRadius: moderateScale(12),
-    backgroundColor: "grey",
+    // backgroundColor: "grey",
     marginTop: moderateScale(8),
+    position: "relative",
   },
   video: {
     width: '100%',
     height: verticalScale(450),
-  }
+  },
+  loaderOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0)", // semi-transparent black
+    borderRadius: moderateScale(12),
+    zIndex: 10,
+  },
 })
