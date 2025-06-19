@@ -198,51 +198,57 @@ export default function Login() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.keyboardcontainer}
+      style={{ flex: 1}}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={styles.container}>
-        <LinearGradient
-          colors={["#FF675B", "#87C6E8"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.upperGradientContainer}
-        />
-        <TouchableOpacity style={styles.backContainer} onPress={goBack}>
-          <View style={styles.back}>
-            <Entypo
-              name="chevron-left"
-              size={moderateScale(20)}
-              color="#FF675B"
+      <ScrollView
+        contentContainerStyle={{flexGrow: 1}}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.container}>
+          <LinearGradient
+            colors={["#FF675B", "#87C6E8"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.upperGradientContainer}
+          />
+          <TouchableOpacity style={styles.backContainer} onPress={goBack}>
+            <View style={styles.back}>
+              <Entypo
+                name="chevron-left"
+                size={moderateScale(20)}
+                color="#FF675B"
+              />
+            </View>
+          </TouchableOpacity>
+          <View style={styles.backgroundCircle1} />
+          <View style={styles.backgroundCircle2} />
+          <View style={styles.backgroundCircle3} />
+          <View style={styles.backgroundSquare} />
+          <View style={styles.sectionStartImage}>
+            <Image
+              style={styles.loginPanda}
+              source={require("assets/images/imgs/npte-ninja-logo.png")}
             />
           </View>
-        </TouchableOpacity>
-        <View style={styles.backgroundCircle1} />
-        <View style={styles.backgroundCircle2} />
-        <View style={styles.backgroundCircle3} />
-        <View style={styles.backgroundSquare} />
-        <View style={styles.sectionStartImage}>
-          <Image
-            style={styles.loginPanda}
-            source={require("assets/images/imgs/npte-ninja-logo.png")}
-          />
+          <View style={styles.sectionLogin}>
+            <SectionLogin
+              onLogin={handleLogin}
+              onRegister={handleRegister}
+              onForgetPassword={handleForgetPassword}
+              rememberMe={rememberMe}
+              setRememberMe={SetRememberMe}
+              email={email}
+              password={password}
+              setEmail={SetEmail}
+              setPassword={SetPassword}
+              SetcPassword={SetcPassword}
+            />
+          </View>
+          {isLoading && <PTFELoading />}
         </View>
-        <View style={styles.sectionLogin}>
-          <SectionLogin
-            onLogin={handleLogin}
-            onRegister={handleRegister}
-            onForgetPassword={handleForgetPassword}
-            rememberMe={rememberMe}
-            setRememberMe={SetRememberMe}
-            email={email}
-            password={password}
-            setEmail={SetEmail}
-            setPassword={SetPassword}
-            SetcPassword={SetcPassword}
-          />
-        </View>
-        {isLoading && <PTFELoading />}
-      </View>
+      </ScrollView>
+      
     </KeyboardAvoidingView>
   );
 }
