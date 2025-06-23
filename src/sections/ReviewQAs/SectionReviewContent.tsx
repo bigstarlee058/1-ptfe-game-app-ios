@@ -6,6 +6,9 @@ import styles from "./SectionReviewContentStyle";
 import HTMLView from "react-native-htmlview";
 import { PTFEButton } from "src/components/button";
 import FlagIcon from "assets/icons/FlagIcon";
+import IssueReportModal from "src/components/modal/IssueReportModal";
+import { useSelector } from "react-redux";
+import { reportQuestionIssue } from "src/actions/question/question";
 
 type Props = {
     quizData?: any,
@@ -18,9 +21,12 @@ export default function SectionReviewContent({
     quizMode,
     scrollRef,
 }: Props) {
+    const { user } = useSelector((state: any) => state.userData);
     const [positions, setPositions] = useState<number[]>([]);
     const [scenarioModalVisible, setScenarioModalVisible] = useState(false);
     const [scenario, setScenario] = useState('');
+    const [issuereportModalVisible, setIssueReportModalVisible] = useState(false);
+    const [questionId, setQuestionId] = useState('');
 
     const handleLayout = useCallback((index: number, y: number ) => {
         setPositions(prev => {
@@ -36,7 +42,6 @@ export default function SectionReviewContent({
         }
     }, [positions])
     const items = quizData?.map((item: any, index: number) => {
-
         let correctF = false;
         for (let i = 0; i < item?.answers?.length; i++) {
             // if (item?.answers[i]?.enabled === true &&
@@ -53,6 +58,9 @@ export default function SectionReviewContent({
         };
     });
 
+    const onReportQuestion = async (issueComment: string) => {
+        const result = await reportQuestionIssue(questionId, issueComment);
+    }
 
     return (
         <View style={styles.container}>
@@ -133,12 +141,18 @@ export default function SectionReviewContent({
                                     {item.answerExplanation}
                                 </Text>
                             </View>
-                            <View style={styles.rationaleReportContainer}>
+                            <TouchableOpacity
+                                style={styles.rationaleReportContainer}
+                                onPress={()=> {
+                                    setQuestionId(item.id);
+                                    setIssueReportModalVisible(true);
+
+                                }}>
                                 <FlagIcon />
                                 <Text style={styles.rationaleReportText}>
                                     {"Issue with the question? Let us know. "}
                                 </Text>
-                            </View>
+                            </TouchableOpacity>
                         </View>
                     ))
                 }
@@ -174,6 +188,11 @@ export default function SectionReviewContent({
                 </View>
                 </View>
             </Modal>
+            <IssueReportModal
+                issuereportModalVisible={issuereportModalVisible}
+                setIssueReportModalVisible={setIssueReportModalVisible}
+                onReportQuestion={onReportQuestion}
+            />
         </View>
     )
 }

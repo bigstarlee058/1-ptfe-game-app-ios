@@ -26,3 +26,13 @@ export const getAllQuestionsCategories = async () => {
     const responseData = await apiService.getDataWithAuth('/api/question/category')
     return responseData;
 }
+
+export const reportQuestionIssue = async (question: string, comment: string) => {
+    const data = {
+        question,
+        comment
+    };
+    const responseData = await apiService.postDataWithAuth("/api/issues", data)
+    
+    return responseData;
+}

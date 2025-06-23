@@ -314,6 +314,7 @@ export default function SectionMainContent({
   const updateSubmitData = useCallback(() => {
     let data = submitData;
     let newItem = {
+      id: quizData.questions[currentProb]._id,
       question: problem,
       scenario: scenario,
       answers: "",
