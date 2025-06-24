@@ -9,6 +9,8 @@ import FlagIcon from "assets/icons/FlagIcon";
 import IssueReportModal from "src/components/modal/IssueReportModal";
 import { useSelector } from "react-redux";
 import { reportQuestionIssue } from "src/actions/question/question";
+import RenderHTML from "react-native-render-html";
+import { moderateScale } from "src/config/scale";
 
 type Props = {
     quizData?: any,
@@ -27,6 +29,7 @@ export default function SectionReviewContent({
     const [scenario, setScenario] = useState('');
     const [issuereportModalVisible, setIssueReportModalVisible] = useState(false);
     const [questionId, setQuestionId] = useState('');
+    const [contentWidth, setContentWidth] = useState(0);
 
     const handleLayout = useCallback((index: number, y: number ) => {
         setPositions(prev => {
@@ -133,13 +136,38 @@ export default function SectionReviewContent({
                                 }
                             </View>
 
-                            <View style={styles.rationaleContainer}>
+                            <View 
+                                style={styles.rationaleContainer}
+                                onLayout={e => setContentWidth(e.nativeEvent.layout.width)}>
                                 <Text style={styles.rationaleHeader}>
                                     {"Answer: "}
                                 </Text>
-                                <Text style={styles.rationaleText}>
+                                {/* <Text style={styles.rationaleText}>
                                     {item.answerExplanation}
-                                </Text>
+                                </Text> */}
+                                <RenderHTML
+                                    contentWidth={contentWidth}
+                                    tagsStyles={{
+                                        p: {
+                                        fontFamily: 'segoe-ui',
+                                        fontSize: moderateScale(18),
+                                        color: '#707070',
+                                        },
+                                        span: {
+                                        fontFamily: 'segoe-ui',
+                                        fontSize: moderateScale(18),
+                                        color: '#707070',
+                                        },
+                                        strong: {
+                                        fontFamily: 'segoe-ui',
+                                        fontSize: moderateScale(18),
+                                        color: '#707070',
+                                        },
+                                    }}
+                                    source={{ html: `<p>${item.answerExplanation}</p>` }}
+                                />
+                                
+
                             </View>
                             <TouchableOpacity
                                 style={styles.rationaleReportContainer}

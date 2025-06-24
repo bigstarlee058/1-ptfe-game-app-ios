@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 
 import styles from "./PartAnswerStyle";
+import RenderHTML from "react-native-render-html";
 
 type Props = {
     index: string;
@@ -22,6 +23,7 @@ export default function PartAnswer({
     clickable,
     onClick,
 }: Props) {
+    const [contentWidth, setContentWidth] = useState(0);
     return (
         <TouchableOpacity 
             style={[
@@ -49,13 +51,22 @@ export default function PartAnswer({
                     </Text>
                 </View>
             </View>
-            <View style={styles.columnContent}>
-                <Text style={[styles.content, 
-                    enabled || correct || mine ? {color: "white"} : {}
-                    ]}
-                >
-                    {content}
-                </Text> 
+            <View 
+                style={styles.columnContent}
+                onLayout={e => setContentWidth(e.nativeEvent.layout.width)}>
+                <RenderHTML
+                    contentWidth={contentWidth}
+                    tagsStyles={
+                        enabled || correct || mine
+                            ? {
+                                p: { color: 'white' },
+                                strong: { color: 'white' },
+                                span: { color: 'white' }
+                            }
+                            : {}
+                        }
+                    source={{ html: `<p>${content}</p>` }}
+                />
             </View>
         </TouchableOpacity>
     )
