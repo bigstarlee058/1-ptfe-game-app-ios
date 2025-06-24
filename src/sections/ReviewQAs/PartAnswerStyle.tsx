@@ -46,6 +46,7 @@ export default StyleSheet.create({
         paddingVertical: moderateScale(4),
 
         width: "75%",
+        minHeight: 100,
     },
     content: {
         fontFamily: "poppins-regular",
