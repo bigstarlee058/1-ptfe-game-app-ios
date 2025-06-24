@@ -65,7 +65,7 @@ export default function PartAnswer({
                             }
                             : {}
                         }
-                    source={{ html: `<p>${content}</p>` }}
+                    source={{ html: `${content}` }}
                 />
             </View>
         </TouchableOpacity>
