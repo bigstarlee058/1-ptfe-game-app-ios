@@ -24,6 +24,7 @@ export default function PartAnswer({
     onClick,
 }: Props) {
     const [contentWidth, setContentWidth] = useState(0);
+    const isHtml = /<\/?[a-z][\s\S]*>/i.test(content);
     return (
         <TouchableOpacity 
             style={[
@@ -54,19 +55,28 @@ export default function PartAnswer({
             <View 
                 style={styles.columnContent}
                 onLayout={e => setContentWidth(e.nativeEvent.layout.width)}>
-                <RenderHTML
-                    contentWidth={contentWidth}
-                    tagsStyles={
-                        enabled || correct || mine
-                            ? {
-                                p: { color: 'white' },
-                                strong: { color: 'white' },
-                                span: { color: 'white' }
+                { isHtml ?
+                    <RenderHTML
+                        contentWidth={contentWidth}
+                        tagsStyles={
+                            enabled || correct || mine
+                                ? {
+                                    p: { color: 'white' },
+                                    strong: { color: 'white' },
+                                    span: { color: 'white' }
+                                }
+                                : {}
                             }
-                            : {}
-                        }
-                    source={{ html: `<p>${content}</p>` }}
-                />
+                        source={{ html: content}}
+                    />
+                :
+                    <Text style={[styles.content, 
+                        enabled || correct || mine ? {color: "white"} : {}
+                        ]}
+                    >
+                        {content}
+                    </Text>
+                }
             </View>
         </TouchableOpacity>
     )

@@ -142,30 +142,34 @@ export default function SectionReviewContent({
                                 <Text style={styles.rationaleHeader}>
                                     {"Answer: "}
                                 </Text>
-                                {/* <Text style={styles.rationaleText}>
-                                    {item.answerExplanation}
-                                </Text> */}
-                                <RenderHTML
-                                    contentWidth={contentWidth}
-                                    tagsStyles={{
-                                        p: {
-                                        fontFamily: 'segoe-ui',
-                                        fontSize: moderateScale(18),
-                                        color: '#707070',
-                                        },
-                                        span: {
-                                        fontFamily: 'segoe-ui',
-                                        fontSize: moderateScale(18),
-                                        color: '#707070',
-                                        },
-                                        strong: {
-                                        fontFamily: 'segoe-ui',
-                                        fontSize: moderateScale(18),
-                                        color: '#707070',
-                                        },
-                                    }}
-                                    source={{ html: `<p>${item.answerExplanation}</p>` }}
-                                />
+                                
+                                { /<\/?[a-z][\s\S]*>/i.test(item.answerExplanation) ?
+                                    <RenderHTML
+                                        contentWidth={contentWidth}
+                                        tagsStyles={{
+                                            p: {
+                                            fontFamily: 'segoe-ui',
+                                            fontSize: moderateScale(18),
+                                            color: '#707070',
+                                            },
+                                            span: {
+                                            fontFamily: 'segoe-ui',
+                                            fontSize: moderateScale(18),
+                                            color: '#707070',
+                                            },
+                                            strong: {
+                                            fontFamily: 'segoe-ui',
+                                            fontSize: moderateScale(18),
+                                            color: '#707070',
+                                            },
+                                        }}
+                                        source={{ html:  item.answerExplanation }}
+                                    />
+                                :
+                                    <Text style={styles.rationaleText}>
+                                        {item.answerExplanation}
+                                    </Text>
+                                }
                                 
 
                             </View>
