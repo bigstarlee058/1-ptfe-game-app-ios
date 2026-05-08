@@ -1,20 +1,16 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, View } from "react-native";
-import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
+import React, { useCallback, useState } from "react";
+import { ActivityIndicator, View } from "react-native";
+import { Video, ResizeMode } from 'expo-av';
 
 import SectionCategory from "src/sections/Category/SectionCategory";
 import styles from "./CategoryStyle";
-import SectionHeader from "src/sections/Common/SectionHeader";
 import SectionHeaderX from "src/sections/Common/SectionHeaderX";
 import { LinearGradient } from "expo-linear-gradient";
 import { gameModeString } from "src/constants/consts";
 import { useFocusEffect } from "@react-navigation/native";
-import { user_test_data } from "assets/@mockup/data";
-import { useVideo } from "src/hooks/useVideo";
 import { useSelector } from "react-redux";
-import WebView from "react-native-webview";
 import { useClientVideo } from "src/hooks/useClientVideo";
-
+const FALLBACK_VIMEO_ID = "1033922649";
 
 type Props = {
     route?: any,
@@ -25,11 +21,11 @@ export default function Category({
     route,
     navigation,
 }: Props) {
-    const [gameMode, setGameMode] = useState(route.params && route.params["gameMode"] != undefined ? route.params["gameMode"] : 1);
+    const initialGameMode = route?.params?.gameMode ?? 1;
+    const [gameMode, setGameMode] = useState(initialGameMode);
     const player = React.useRef<Video | null>(null); // Type the reference here
-    const [status, setStatus] = useState({});
     const { user } = useSelector((state: any) => state.userData);
-    const [video_url, setvideo_url] = useState("");
+    const [videoId, setVideoId] = useState(FALLBACK_VIMEO_ID);
     const [isBuffering, setIsBuffering] = useState(true);
 
     useFocusEffect(
@@ -41,24 +37,20 @@ export default function Category({
           }
       
           // Fetch the video data again
-          const fetchVideoData = async () => {
-            if (route.params && route.params["gameMode"] !== undefined) {
-              setGameMode(route.params["gameMode"]);
-              
-              const matchedVideo = user.videos.find(
-                (video: { title: string }) => video.title === gameModeString[route.params["gameMode"]]
-              );
-              if (matchedVideo) {
-                setvideo_url(matchedVideo.vimeoId);
-              } else {
-                setvideo_url('1033922649');
-              }
-            }
-          };
-          fetchVideoData();
-        }, [route.params, user.videos])
+          const nextGameMode = route?.params?.gameMode ?? initialGameMode;
+          setGameMode(nextGameMode);
+
+          const userVideos = Array.isArray(user?.videos) ? user.videos : [];
+          const matchedVideo = userVideos.find(
+            (video: { title?: string; vimeoId?: string }) =>
+              video?.title === gameModeString[nextGameMode] && !!video?.vimeoId
+          );
+
+          setVideoId(matchedVideo?.vimeoId ?? FALLBACK_VIMEO_ID);
+          setIsBuffering(true);
+        }, [initialGameMode, route?.params?.gameMode, user?.videos])
       );
-    const {thumbnailUrl, videoUrl, video} = useClientVideo("1070136177");
+    const { videoUrl } = useClientVideo(videoId);
 
     const gotoDashboard = useCallback(() => {
         navigation.navigate("Home", {
@@ -97,7 +89,6 @@ export default function Category({
                     isLooping
                     shouldPlay={true}
                     onPlaybackStatusUpdate={status => {
-                      setStatus(() => status);
                       if (status.isLoaded) {
                         const buffering =
                           ('isBuffering' in status && status.isBuffering) ||
